@@ -1,0 +1,28 @@
+TEMPLATE TÍNH ĐIỂM KPI DESIGNER — THÁNG __ /____ (nhân bản sheet này mỗi tháng),Unnamed: 1,Unnamed: 2,Unnamed: 3,Unnamed: 4,Unnamed: 5,Unnamed: 6,Unnamed: 7,Unnamed: 8,Unnamed: 9,Unnamed: 10,Unnamed: 11,Unnamed: 12,Unnamed: 13,Unnamed: 14,Unnamed: 15,Unnamed: 16,Unnamed: 17,Unnamed: 18,Unnamed: 19,Unnamed: 20,Unnamed: 21,Unnamed: 22,Unnamed: 23,Unnamed: 24,Unnamed: 25,Unnamed: 26,"🏆 BẢNG XẾP HẠNG (tự động, giảm dần theo Tổng điểm KPI)",Unnamed: 28,Unnamed: 29,Unnamed: 30,Unnamed: 31
+Designer,Nhóm,Tổng số task,Tổng điểm thô (loại task),PROX5,PROX4,PROX3,SEM,SE1,E0,Đã phân loại gói,Hệ số độ khó TB,Điểm số lượng,Điểm độ khó,Chất lượng TB (1-5),Điểm chất lượng,Số task trễ hạn,Tổng ngày trễ,Điểm bonus,Ghi chú bonus,Điểm bonus/trễ,TỔNG ĐIỂM KPI (%),Xếp hạng,Trạng thái,,Khoá (ẩn),,Hạng,Designer,Nhóm,Tổng điểm (%),Trạng thái
+Heidi,Media Key,0,0,0,0,0,0,0,0,0,0,0,0,,,0,0,0,,0,0,1,❌ Chưa đạt,,0,,1,Meran,Media CTV,0,❌ Chưa đạt
+Titus,Media Key,0,0,0,0,0,0,0,0,0,0,0,0,,,0,0,0,,0,0,1,❌ Chưa đạt,,1e-08,,2,Henri,Media CTV,0,❌ Chưa đạt
+Ocean,Media Key,0,0,0,0,0,0,0,0,0,0,0,0,,,0,0,0,,0,0,1,❌ Chưa đạt,,2e-08,,3,Phat,Media CTV,0,❌ Chưa đạt
+Julie,Media Key,0,0,0,0,0,0,0,0,0,0,0,0,,,0,0,0,,0,0,1,❌ Chưa đạt,,3e-08,,4,Q.Anh,Media CTV,0,❌ Chưa đạt
+Helia,Media Key,0,0,0,0,0,0,0,0,0,0,0,0,,,0,0,0,,0,0,1,❌ Chưa đạt,,4e-08,,5,Uri,Media CTV,0,❌ Chưa đạt
+Clara,Media Key,0,0,0,0,0,0,0,0,0,0,0,0,,,0,0,0,,0,0,1,❌ Chưa đạt,,5e-08,,6,Nah,Media CTV,0,❌ Chưa đạt
+Mio,Media Key,0,0,0,0,0,0,0,0,0,0,0,0,,,0,0,0,,0,0,1,❌ Chưa đạt,,6e-08,,7,Vi,Media CTV,0,❌ Chưa đạt
+Daniel,Media Key,0,0,0,0,0,0,0,0,0,0,0,0,,,0,0,0,,0,0,1,❌ Chưa đạt,,7e-08,,8,My,Media CTV,0,❌ Chưa đạt
+Barry,Media Key,0,0,0,0,0,0,0,0,0,0,0,0,,,0,0,0,,0,0,1,❌ Chưa đạt,,8e-08,,9,Sean,Media Key,0,❌ Chưa đạt
+Sherry,Media Key,0,0,0,0,0,0,0,0,0,0,0,0,,,0,0,0,,0,0,1,❌ Chưa đạt,,9e-08,,10,Yollie,Media Key,0,❌ Chưa đạt
+Nathan,Media Key,0,0,0,0,0,0,0,0,0,0,0,0,,,0,0,0,,0,0,1,❌ Chưa đạt,,1e-07,,11,Alex,Media Key,0,❌ Chưa đạt
+Charlie,Media Key,0,0,0,0,0,0,0,0,0,0,0,0,,,0,0,0,,0,0,1,❌ Chưa đạt,,1.1e-07,,12,Charlie,Media Key,0,❌ Chưa đạt
+Alex,Media Key,0,0,0,0,0,0,0,0,0,0,0,0,,,0,0,0,,0,0,1,❌ Chưa đạt,,1.2e-07,,13,Nathan,Media Key,0,❌ Chưa đạt
+Yollie,Media Key,0,0,0,0,0,0,0,0,0,0,0,0,,,0,0,0,,0,0,1,❌ Chưa đạt,,1.3e-07,,14,Sherry,Media Key,0,❌ Chưa đạt
+Sean,Media Key,0,0,0,0,0,0,0,0,0,0,0,0,,,0,0,0,,0,0,1,❌ Chưa đạt,,1.4e-07,,15,Barry,Media Key,0,❌ Chưa đạt
+My,Media CTV,0,0,0,0,0,0,0,0,0,0,0,0,,,0,0,0,,0,0,1,❌ Chưa đạt,,1.5e-07,,16,Daniel,Media Key,0,❌ Chưa đạt
+Vi,Media CTV,0,0,0,0,0,0,0,0,0,0,0,0,,,0,0,0,,0,0,1,❌ Chưa đạt,,1.6e-07,,17,Mio,Media Key,0,❌ Chưa đạt
+Nah,Media CTV,0,0,0,0,0,0,0,0,0,0,0,0,,,0,0,0,,0,0,1,❌ Chưa đạt,,1.7e-07,,18,Clara,Media Key,0,❌ Chưa đạt
+Uri,Media CTV,0,0,0,0,0,0,0,0,0,0,0,0,,,0,0,0,,0,0,1,❌ Chưa đạt,,1.8e-07,,19,Helia,Media Key,0,❌ Chưa đạt
+Q.Anh,Media CTV,0,0,0,0,0,0,0,0,0,0,0,0,,,0,0,0,,0,0,1,❌ Chưa đạt,,1.9e-07,,20,Julie,Media Key,0,❌ Chưa đạt
+Phat,Media CTV,0,0,0,0,0,0,0,0,0,0,0,0,,,0,0,0,,0,0,1,❌ Chưa đạt,,2e-07,,21,Ocean,Media Key,0,❌ Chưa đạt
+Henri,Media CTV,0,0,0,0,0,0,0,0,0,0,0,0,,,0,0,0,,0,0,1,❌ Chưa đạt,,2.1e-07,,22,Titus,Media Key,0,❌ Chưa đạt
+Meran,Media CTV,0,0,0,0,0,0,0,0,0,0,0,0,,,0,0,0,,0,0,1,❌ Chưa đạt,,2.2e-07,,23,Heidi,Media Key,0,❌ Chưa đạt
+TỔNG (số lượng) / TRUNG BÌNH (điểm),,0,0,,,,,,,0,,0,0,,,,,,,0,0,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"Hướng dẫn: 1) Xuất danh sách task tháng mới (Title, Assignee) từ app, dán vào sheet ""Data thô (dán hàng tháng)"" từ dòng 3. 2) Nhân bản sheet này (right-click tab → Move or Copy → Create a copy), đổi tên theo tháng. 3) Nhập thêm: số task theo gói (PROX5–E0) nếu có, Chất lượng TB (1-5), Số task/ngày trễ hạn, Điểm bonus. Điểm, Xếp hạng và Bảng xếp hạng bên phải tự tính lại.",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,

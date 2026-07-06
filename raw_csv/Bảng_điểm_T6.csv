@@ -1,0 +1,39 @@
+"BẢNG TÍNH ĐIỂM KPI DESIGNER — THÁNG 6/2026 (chỉ dùng file check mới nhất, không lọc status)",Unnamed: 1,Unnamed: 2,Unnamed: 3,Unnamed: 4,Unnamed: 5,Unnamed: 6,Unnamed: 7,Unnamed: 8,Unnamed: 9,Unnamed: 10,Unnamed: 11,Unnamed: 12,Unnamed: 13,Unnamed: 14,Unnamed: 15,Unnamed: 16,Unnamed: 17,Unnamed: 18,Unnamed: 19,Unnamed: 20,Unnamed: 21,Unnamed: 22,Unnamed: 23,Unnamed: 24,Unnamed: 25,Unnamed: 26,"🏆 BẢNG XẾP HẠNG (tự động, giảm dần theo Tổng điểm KPI)",Unnamed: 28,Unnamed: 29,Unnamed: 30,Unnamed: 31
+Designer,Nhóm,Tổng số task,Tổng điểm thô (loại task),PROX5,PROX4,PROX3,SEM,SE1,E0,Đã phân loại gói,Hệ số độ khó TB,Điểm số lượng,Điểm độ khó,Chất lượng TB (1-5),Điểm chất lượng,Số task trễ hạn,Tổng ngày trễ,Điểm bonus,Ghi chú bonus,Điểm bonus/trễ,TỔNG ĐIỂM KPI (%),Xếp hạng,Trạng thái,,Khoá (ẩn),,Hạng,Designer,Nhóm,Tổng điểm (%),Trạng thái
+Helia,Media Key,250,362,4,63,166,0,0,6,239,1.1428,60,8.3025,,,0,0,0,,0,68.3025,5,❌ Chưa đạt,,68.3025,,1,Sherry,Media Key,69.73790323,❌ Chưa đạt
+Clara,Media Key,250,355,14,44,161,0,0,11,230,1.132,60,8.1,,,0,0,0,,0,68.1,7,❌ Chưa đạt,,68.10000001,,2,Nancy,Media Key,69.23611111,❌ Chưa đạt
+Daniel,Media Key,246,379,2,47,149,1,0,19,218,1.098780488,60,7.477134146,,,0,0,0,,0,67.47713415,13,❌ Chưa đạt,,67.47713417,,3,Mio,Media Key,68.45723684,❌ Chưa đạt
+Heidi,Media Key,220,330,0,34,156,0,0,10,200,1.103636364,60,7.568181818,,,0,0,0,,0,67.56818182,12,❌ Chưa đạt,,67.56818185,,4,Charlie,Media Key,68.4375,❌ Chưa đạt
+Barry,Media Key,217,328,11,49,110,4,5,20,199,1.113824885,60,7.75921659,,,0,0,0,,0,67.75921659,9,❌ Chưa đạt,,67.75921663,,5,Helia,Media Key,68.3025,❌ Chưa đạt
+Alex,Media Key,213,289,17,32,120,0,0,33,202,1.094835681,60,7.403169014,,,0,0,0,,0,67.40316901,14,❌ Chưa đạt,,67.40316906,,6,Titus,Media Key,68.259375,❌ Chưa đạt
+Ocean,Media Key,202,279,13,42,102,0,9,21,187,1.109405941,60,7.676361386,,,0,0,0,,0,67.67636139,10,❌ Chưa đạt,,67.67636145,,7,Clara,Media Key,68.1,❌ Chưa đạt
+Titus,Media Key,200,270,8,39,139,2,0,5,193,1.1405,60,8.259375,,,0,0,0,,0,68.259375,6,❌ Chưa đạt,,68.25937507,,8,Julie,Media Key,68.01535088,❌ Chưa đạt
+Leon Le,Media Key,194,266,7,24,137,1,2,13,184,1.104639175,60,7.586984536,,,0,0,0,,0,67.58698454,11,❌ Chưa đạt,,67.58698462,,9,Barry,Media Key,67.75921659,❌ Chưa đạt
+Mio,Media Key,190,249,8,48,124,1,0,7,188,1.151052632,60,8.457236842,,,0,0,0,,0,68.45723684,3,❌ Chưa đạt,,68.45723693,,10,Ocean,Media Key,67.67636139,❌ Chưa đạt
+Julie,Media Key,171,229,5,35,112,1,0,8,161,1.12748538,60,8.015350877,,,0,0,0,,0,68.01535088,8,❌ Chưa đạt,,68.01535098,,11,Leon Le,Media Key,67.58698454,❌ Chưa đạt
+My,Media CTV,81,81,1,15,41,1,1,11,70,1.07037037,32.4,6.944444444,,,0,0,0,,0,39.34444444,20,❌ Chưa đạt,,39.34444455,,12,Heidi,Media Key,67.56818182,❌ Chưa đạt
+Vi,Media CTV,80,80,1,10,55,0,1,5,72,1.0925,32,7.359375,,,0,0,0,,0,39.359375,19,❌ Chưa đạt,,39.35937512,,13,Daniel,Media Key,67.47713415,❌ Chưa đạt
+Nah,Media CTV,80,80,1,16,37,4,3,12,73,1.06375,32,6.8203125,,,0,0,0,,0,38.8203125,23,❌ Chưa đạt,,38.82031263,,14,Alex,Media Key,67.40316901,❌ Chưa đạt
+Uri,Media CTV,80,80,6,12,42,1,1,8,70,1.10375,32,7.5703125,,,0,0,0,,0,39.5703125,16,❌ Chưa đạt,,39.57031264,,15,Nathan,Media Key,44.41029412,❌ Chưa đạt
+Q.Anh,Media CTV,80,80,0,12,50,0,3,7,72,1.0775,32,7.078125,,,0,0,0,,0,39.078125,22,❌ Chưa đạt,,39.07812515,,16,Uri,Media CTV,39.5703125,❌ Chưa đạt
+Phat,Media CTV,80,80,0,13,48,0,0,3,64,1.0975,32,7.453125,,,0,0,0,,0,39.453125,18,❌ Chưa đạt,,39.45312516,,17,Meran,Media CTV,39.546875,❌ Chưa đạt
+Henri,Media CTV,80,80,1,10,48,1,1,5,66,1.08375,32,7.1953125,,,0,0,0,,0,39.1953125,21,❌ Chưa đạt,,39.19531267,,18,Phat,Media CTV,39.453125,❌ Chưa đạt
+Meran,Media CTV,80,80,0,8,62,0,1,1,72,1.1025,32,7.546875,,,0,0,0,,0,39.546875,17,❌ Chưa đạt,,39.54687518,,19,Vi,Media CTV,39.359375,❌ Chưa đạt
+Sean,Media Key,32,32,1,6,18,0,0,3,28,1.1,12.8,7.5,,,0,0,0,,0,20.3,24,❌ Chưa đạt,,20.30000019,,20,My,Media CTV,39.34444444,❌ Chưa đạt
+Sherry,Media Key,31,189,1,17,12,0,0,0,30,1.219354839,60,9.737903226,,,0,0,0,,0,69.73790323,1,❌ Chưa đạt,,69.73790343,,21,Henri,Media CTV,39.1953125,❌ Chưa đạt
+Charlie,Media Key,28,150,3,9,6,0,0,2,20,1.15,60,8.4375,,,0,0,0,,0,68.4375,4,❌ Chưa đạt,,68.43750021,,22,Q.Anh,Media CTV,39.078125,❌ Chưa đạt
+Nancy,Media Key,27,155,3,11,4,0,0,0,18,1.192592593,60,9.236111111,,,0,0,0,,0,69.23611111,2,❌ Chưa đạt,,69.23611133,,23,Nah,Media CTV,38.8203125,❌ Chưa đạt
+Nathan,Media Key,17,92,3,1,6,0,0,2,12,1.105882353,36.8,7.610294118,,,0,0,0,,0,44.41029412,15,❌ Chưa đạt,,44.41029435,,24,Sean,Media Key,20.3,❌ Chưa đạt
+Yollie,Media Key,0,0,0,0,0,0,0,0,0,0,0,0,,,0,0,0,,0,0,25,❌ Chưa đạt,,2.4e-07,,25,Yollie,Media Key,0,❌ Chưa đạt
+TỔNG (số lượng) / TRUNG BÌNH (điểm),,3129,4595,,,,,,,2868,,45.84,7.483808024,,,,,,,0,53.32380802,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+⚠ Task gán cho AM / Intern / tên không xác định (số lượng nhỏ) — KHÔNG tính vào KPI,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Tên trong dữ liệu,Loại,Số task,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Sonny Nguyen (Intern),Intern,21,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Kimmy Le,Chưa xác định,20,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Anna,AM (gán nhầm/kiêm nhiệm?),2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Elio Nguyen (Intern),Intern,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Vo Hoang kiet,Chưa xác định,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Fury Nguyen,Chưa xác định,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"Nguồn DUY NHẤT: file ""check - Export data - Task Design 6-2026.csv"". File không có cột status/deadline nên KHÔNG lọc theo hoàn thành và KHÔNG tự tính trễ hạn (cột Số task trễ hạn / Tổng ngày trễ chuyển lại thành nhập tay). Bỏ qua 28 task không có ai được giao. Phat, Henri, Meran giờ có đủ 80 task/người.",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,

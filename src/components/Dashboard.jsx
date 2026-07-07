@@ -102,7 +102,7 @@ export default function Dashboard({
       </div>
 
       {/* 2. Scoreboard Filters Bar */}
-      <div className="glass-card" style={{ padding: "1.25rem", display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "center", justifyContent: "space-between" }}>
+      <div className="glass-card dashboard-filter-bar" style={{ padding: "1.25rem", display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", flex: 1 }}>
           {/* Search bar */}
           <div style={{ minWidth: "240px", flex: 1 }}>

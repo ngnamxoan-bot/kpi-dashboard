@@ -1,6 +1,5 @@
 import React from "react";
 
-// Inline SVG Icons
 const IconDashboard = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <rect x="3" y="3" width="7" height="9" />
@@ -57,18 +56,27 @@ export default function Layout({
 }) {
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: <IconDashboard /> },
-    { id: "profiles", label: "Designer Profiles", icon: <IconProfile /> },
-    { id: "report", label: "Workload Report", icon: <IconReport /> },
+    { id: "profiles", label: "Profiles", icon: <IconProfile /> },
+    { id: "report", label: "Report", icon: <IconReport /> },
     ...(isManager ? [
-      { id: "import", label: "CSV Import", icon: <IconUpload /> },
-      { id: "settings", label: "Rules & Settings", icon: <IconSettings /> },
+      { id: "import", label: "Import", icon: <IconUpload /> },
+      { id: "settings", label: "Settings", icon: <IconSettings /> },
     ] : [])
   ];
 
+  const tabLabels = {
+    dashboard: "Team KPI Scoreboard",
+    profiles: "Designer Performance Profiles",
+    report: "Workload & Package Analytics",
+    import: "Ingest Task Data",
+    settings: "Configuration Settings"
+  };
+
   return (
     <div className="app-container">
-      {/* Sidebar */}
-      <aside style={{
+
+      {/* ── DESKTOP SIDEBAR ── */}
+      <aside className="sidebar-desktop" style={{
         width: "var(--sidebar-width)",
         backgroundColor: "var(--bg-sidebar)",
         borderRight: "1px solid var(--border-muted)",
@@ -99,7 +107,8 @@ export default function Layout({
               boxShadow: "0 0 15px 0 var(--primary-glow)",
               fontWeight: 800,
               fontSize: "1.2rem",
-              color: "#070913"
+              color: "#070913",
+              flexShrink: 0
             }}>
               M
             </div>
@@ -109,13 +118,8 @@ export default function Layout({
             </div>
           </div>
 
-          {/* Month Switcher Dropdown */}
-          <div style={{
-            padding: "1.25rem 1.25rem 0.5rem",
-            display: "flex",
-            flexDirection: "column",
-            gap: "0.35rem"
-          }}>
+          {/* Month Switcher */}
+          <div style={{ padding: "1.25rem 1.25rem 0.5rem", display: "flex", flexDirection: "column", gap: "0.35rem" }}>
             <span style={{ fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-muted)", fontWeight: 600 }}>Active Month</span>
             <select
               value={currentMonthKey}
@@ -130,9 +134,7 @@ export default function Layout({
               }}
             >
               {Object.keys(monthsData || {}).map(key => (
-                <option key={key} value={key}>
-                  {monthsData[key]?.label || key}
-                </option>
+                <option key={key} value={key}>{monthsData[key]?.label || key}</option>
               ))}
             </select>
           </div>
@@ -164,7 +166,7 @@ export default function Layout({
                   }}
                 >
                   <span style={{ display: "flex", alignItems: "center" }}>{item.icon}</span>
-                  {item.label}
+                  {item.label === "Profiles" ? "Designer Profiles" : item.label === "Import" ? "CSV Import" : item.label === "Settings" ? "Rules & Settings" : item.label}
                 </button>
               );
             })}
@@ -183,7 +185,7 @@ export default function Layout({
           <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "white" }}>{monthsData[currentMonthKey]?.label || currentMonthKey}</span>
           <span style={{ fontSize: "0.65rem", color: "var(--primary)", marginTop: "0.5rem" }}>v1.0.0 · Live calculated</span>
 
-          <button 
+          <button
             onClick={isManager ? onLogout : onLoginClick}
             className="btn"
             style={{
@@ -203,10 +205,81 @@ export default function Layout({
         </div>
       </aside>
 
-      {/* Main Container */}
+      {/* ── MOBILE TOP HEADER (hidden on desktop via CSS) ── */}
+      <header className="mobile-header" style={{
+        display: "none", /* shown via media query */
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 200,
+        height: "56px",
+        backgroundColor: "rgba(11,14,34,0.97)",
+        borderBottom: "1px solid var(--border-muted)",
+        backdropFilter: "blur(10px)",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "0 1rem",
+        gap: "0.75rem"
+      }}>
+        {/* Logo */}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0 }}>
+          <div style={{
+            width: "28px", height: "28px",
+            borderRadius: "6px",
+            background: "linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontWeight: 800, fontSize: "0.9rem", color: "#070913"
+          }}>M</div>
+          <span style={{ fontWeight: 700, fontSize: "0.95rem", color: "white", letterSpacing: "-0.01em" }}>MAC MEDIA</span>
+        </div>
+
+        {/* Month Dropdown */}
+        <select
+          value={currentMonthKey}
+          onChange={(e) => setCurrentMonthKey(e.target.value)}
+          className="form-select"
+          style={{
+            flex: 1,
+            maxWidth: "140px",
+            fontSize: "0.8rem",
+            fontWeight: 700,
+            color: "var(--primary)",
+            background: "rgba(15,19,44,0.9)",
+            borderColor: "rgba(255,255,255,0.1)",
+            padding: "0.35rem 0.6rem",
+            minHeight: "36px"
+          }}
+        >
+          {Object.keys(monthsData || {}).map(key => (
+            <option key={key} value={key}>{monthsData[key]?.label || key}</option>
+          ))}
+        </select>
+
+        {/* Admin Login/Logout */}
+        <button
+          onClick={isManager ? onLogout : onLoginClick}
+          className="btn"
+          style={{
+            flexShrink: 0,
+            padding: "0.35rem 0.65rem",
+            fontSize: "0.72rem",
+            minHeight: "36px",
+            background: isManager ? "rgba(239,68,68,0.12)" : "rgba(0,242,254,0.1)",
+            color: isManager ? "var(--danger)" : "var(--primary)",
+            border: isManager ? "1px solid rgba(239,68,68,0.3)" : "1px solid rgba(0,242,254,0.3)",
+            whiteSpace: "nowrap"
+          }}
+        >
+          {isManager ? "🔒 Logout" : "🔓 Login"}
+        </button>
+      </header>
+
+      {/* ── MAIN COLUMN ── */}
       <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
-        {/* Topbar header */}
-        <header style={{
+
+        {/* Desktop topbar */}
+        <header className="topbar-desktop" style={{
           marginLeft: "var(--sidebar-width)",
           height: "70px",
           borderBottom: "1px solid var(--border-muted)",
@@ -221,14 +294,10 @@ export default function Layout({
           zIndex: 90
         }}>
           <h2 style={{ fontSize: "1.2rem", fontWeight: 700, color: "white" }}>
-            {activeTab === "dashboard" ? "Team KPI Scoreboard" :
-             activeTab === "profiles" ? "Designer Performance Profiles" :
-             activeTab === "report" ? "Workload & Package Analytics" :
-             activeTab === "import" ? "Ingest Task Data" : "Configuration Settings"}
+            {tabLabels[activeTab] || ""}
           </h2>
 
           <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-            {/* Manual Save Button */}
             <button
               onClick={onManualSave}
               disabled={isSaving}
@@ -254,7 +323,6 @@ export default function Layout({
               {isSaving ? "Đang lưu…" : "Lưu dữ liệu"}
             </button>
 
-            {/* Quick Stat Badge */}
             <div style={{
               display: "flex",
               alignItems: "center",
@@ -279,10 +347,59 @@ export default function Layout({
         </header>
 
         {/* View Content */}
-        <main className="main-content">
+        <main className="main-content" style={{ marginLeft: "var(--sidebar-width)", padding: "2rem 2.5rem" }}>
           {children}
         </main>
       </div>
+
+      {/* ── MOBILE BOTTOM NAVIGATION ── */}
+      <nav className="mobile-bottom-nav" style={{
+        display: "none", /* shown via media query */
+        position: "fixed",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 200,
+        height: "64px",
+        backgroundColor: "rgba(11,14,34,0.98)",
+        borderTop: "1px solid var(--border-muted)",
+        backdropFilter: "blur(12px)",
+        alignItems: "stretch",
+        justifyContent: "space-around"
+      }}>
+        {menuItems.map(item => {
+          const isActive = activeTab === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              style={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "3px",
+                background: "transparent",
+                border: "none",
+                color: isActive ? "var(--primary)" : "var(--text-muted)",
+                cursor: "pointer",
+                padding: "0.5rem 0.25rem",
+                transition: "color 0.2s",
+                borderTop: isActive ? "2px solid var(--primary)" : "2px solid transparent"
+              }}
+            >
+              <span style={{ display: "flex", alignItems: "center" }}>
+                {React.cloneElement(item.icon, { width: 18, height: 18 })}
+              </span>
+              <span style={{ fontSize: "0.62rem", fontWeight: isActive ? 700 : 500, lineHeight: 1 }}>
+                {item.label}
+              </span>
+            </button>
+          );
+        })}
+      </nav>
+
     </div>
   );
 }

@@ -98,9 +98,9 @@ export default function ConfigPanel({
   const isWeightValid = Math.abs(weightsSum - 100) < 0.01;
 
   return (
-    <div className="animate-fade-in" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "2rem" }}>
+    <div className="animate-fade-in config-layout" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "2rem" }}>
       {/* Settings Navigation */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+      <div className="config-tab-nav" style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
         <button 
           onClick={() => setActiveSubTab("general")}
           className={`btn ${activeSubTab === "general" ? "btn-primary" : "btn-secondary"}`}

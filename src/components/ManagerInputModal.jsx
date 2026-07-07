@@ -46,7 +46,7 @@ export default function ManagerInputModal({
       zIndex: 1000,
       padding: "1rem"
     }} className="animate-fade-in">
-      <div className="glass-card" style={{
+      <div className="glass-card modal-card" style={{
         width: "100%",
         maxWidth: "500px",
         padding: "2rem",

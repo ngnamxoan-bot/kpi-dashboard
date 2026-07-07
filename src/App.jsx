@@ -425,7 +425,7 @@ export default function App() {
     >
       {/* Toast notification */}
       {toastMsg && (
-        <div style={{
+        <div className="toast-notification" style={{
           position: "fixed", top: "20px", right: "20px",
           background: "rgba(7,19,44,0.95)", color: "white",
           padding: "0.85rem 1.5rem", borderRadius: "var(--radius-md)",
@@ -499,7 +499,7 @@ export default function App() {
           display: "flex", alignItems: "center", justifyContent: "center",
           zIndex: 1000
         }}>
-          <div className="glass-card animate-fade-in" style={{
+          <div className="glass-card modal-card animate-fade-in" style={{
             width: "360px", padding: "2rem",
             display: "flex", flexDirection: "column", gap: "1.25rem",
             position: "relative"

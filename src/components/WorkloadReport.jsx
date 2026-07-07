@@ -206,7 +206,7 @@ export default function WorkloadReport({ scorecards }) {
       </div>
 
       {/* 2. Category & Package Distribution Side-by-Side */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }} className="grid-responsive-import">
+      <div className="workload-grid grid-responsive-import" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }}>
         
         {/* Column 1: Task Category Breakdown */}
         <div className="glass-card" style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>

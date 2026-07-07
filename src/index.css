@@ -316,3 +316,179 @@ h1, h2, h3, h4, h5, h6 {
     grid-template-columns: 1fr;
   }
 }
+
+/* ═══════════════════════════════════════════════
+   MOBILE RESPONSIVE — max-width: 768px
+   ═══════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* ── Layout shell ── */
+  .app-container {
+    flex-direction: column;
+  }
+
+  /* Hide desktop sidebar */
+  .sidebar-desktop {
+    display: none !important;
+  }
+
+  /* Main content: no left margin, bottom padding for bottom nav, top for header */
+  .main-content {
+    margin-left: 0 !important;
+    padding: 1rem !important;
+    padding-top: 72px !important;
+    padding-bottom: 80px !important;
+  }
+
+  /* Desktop topbar: hide on mobile (replaced by mobile-header) */
+  .topbar-desktop {
+    display: none !important;
+  }
+
+  /* ── Mobile top header ── */
+  .mobile-header {
+    display: flex !important;
+  }
+
+  /* ── Mobile bottom navigation bar ── */
+  .mobile-bottom-nav {
+    display: flex !important;
+  }
+
+  /* ── Hero stat cards: 2×2 grid ── */
+  .grid-stats {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.75rem !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  .grid-stats .glass-card h3 {
+    font-size: 1.4rem !important;
+  }
+
+  .grid-stats .glass-card {
+    padding: 1rem !important;
+  }
+
+  /* ── Two-col grids → single col ── */
+  .grid-two-cols,
+  .grid-responsive-import {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* ── Table: horizontal scroll, sticky rank+designer ── */
+  .table-container {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Taller rows for touch */
+  .kpi-table td,
+  .kpi-table th {
+    padding: 0.85rem 0.9rem !important;
+  }
+
+  /* Sticky first two columns (Rank + Designer) */
+  .kpi-table th:nth-child(1),
+  .kpi-table td:nth-child(1) {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: #0b0e22;
+  }
+
+  .kpi-table th:nth-child(2),
+  .kpi-table td:nth-child(2) {
+    position: sticky;
+    left: 60px;
+    z-index: 2;
+    background: #0b0e22;
+  }
+
+  /* ── Dashboard filter bar → vertical ── */
+  .dashboard-filter-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .dashboard-filter-bar > div:first-child {
+    flex-direction: column !important;
+  }
+
+  .dashboard-filter-bar select,
+  .dashboard-filter-bar input {
+    width: 100% !important;
+    min-width: unset !important;
+  }
+
+  .dashboard-filter-bar .btn {
+    width: 100% !important;
+    justify-content: center !important;
+    min-height: 44px !important;
+  }
+
+  /* ── Buttons & inputs: min touch target ── */
+  .btn {
+    min-height: 44px !important;
+  }
+
+  .form-input,
+  .form-select {
+    font-size: 16px !important; /* prevents iOS zoom */
+    min-height: 44px !important;
+  }
+
+  /* ── Modals: 92vw, iOS-safe font size ── */
+  .modal-card {
+    width: 92vw !important;
+    max-width: 420px !important;
+    padding: 1.5rem !important;
+  }
+
+  /* ── Config panel: tabs stack vertically ── */
+  .config-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .config-tab-nav {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    gap: 0.5rem !important;
+  }
+
+  .config-tab-nav .btn {
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    min-width: unset !important;
+    padding: 0.6rem 0.85rem !important;
+    font-size: 0.78rem !important;
+  }
+
+  /* ── Workload report: single col ── */
+  .workload-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* ── DesignerProfile KPI breakdown: 2 col then 1 col ── */
+  .grid-responsive-breakdown {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* ── Toast: bottom of screen ── */
+  .toast-notification {
+    top: auto !important;
+    bottom: 88px !important;
+    right: 1rem !important;
+    left: 1rem !important;
+    width: auto !important;
+  }
+
+  /* ── CSV import left col border ── */
+  .import-col-left {
+    border-right: none !important;
+    border-bottom: 1px solid var(--border-muted) !important;
+    padding-right: 0 !important;
+    padding-bottom: 2rem !important;
+  }
+}

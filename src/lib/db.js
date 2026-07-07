@@ -124,12 +124,23 @@ export async function ensureMonth(key, label) {
 // ─── Tasks ───────────────────────────────────────────────────────────────────
 
 export async function fetchTasks(monthKey) {
-  const { data, error } = await supabase
-    .from("kpi_tasks")
-    .select("title, assignee, project, package")
-    .eq("month_key", monthKey);
-  if (error) throw error;
-  return (data || []).map((row) => ({
+  const PAGE = 1000;
+  const allRows = [];
+  let offset = 0;
+
+  while (true) {
+    const { data, error } = await supabase
+      .from("kpi_tasks")
+      .select("title, assignee, project, package")
+      .eq("month_key", monthKey)
+      .range(offset, offset + PAGE - 1);
+    if (error) throw error;
+    allRows.push(...(data || []));
+    if ((data || []).length < PAGE) break;
+    offset += PAGE;
+  }
+
+  return allRows.map((row) => ({
     title: row.title,
     assignee: row.assignee,
     project: row.project,

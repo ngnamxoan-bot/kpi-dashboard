@@ -16,7 +16,8 @@ export const DEFAULT_CONFIG = {
     "SEM": 1.0,
     "SE1": 0.9,
     "SE0": 0.9,
-    "E0": 0.7
+    "E0": 0.7,
+    "KHAC": 0.7
   },
   "hsMin": 0.7,
   "hsMax": 1.5,

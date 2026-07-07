@@ -292,7 +292,7 @@ export default function App() {
   const exportToCSV = () => {
     const headers = [
       "Hạng","Designer","Nhóm","Tổng số task","Tổng điểm thô",
-      "PROX5","PROX4","PROX3","SEM","SE1","SE0","E0","Đã phân loại gói",
+      "PROX5","PROX4","PROX3","SEM","SE1","SE0","E0","KHAC","Đã phân loại gói",
       "Hệ số độ khó TB","Điểm số lượng","Điểm độ khó",
       "Chất lượng TB (1-3)","Điểm chất lượng",
       "Số task trễ hạn","Tổng ngày trễ","Điểm bonus","Ghi chú bonus",
@@ -302,7 +302,7 @@ export default function App() {
       sc.rank, sc.designerName, sc.group, sc.totalTasks,
       sc.totalPointsTho.toFixed(1),
       sc.packageCounts.PROX5, sc.packageCounts.PROX4, sc.packageCounts.PROX3,
-      sc.packageCounts.SEM, sc.packageCounts.SE1, sc.packageCounts.SE0, sc.packageCounts.E0,
+      sc.packageCounts.SEM, sc.packageCounts.SE1, sc.packageCounts.SE0, sc.packageCounts.E0, sc.packageCounts.KHAC,
       sc.daPhanLoaiGoi, sc.avgDifficultyCoefficient.toFixed(2),
       sc.diemSoLuong.toFixed(1), sc.diemDoKho.toFixed(1),
       sc.qualityRating !== null ? sc.qualityRating : "",

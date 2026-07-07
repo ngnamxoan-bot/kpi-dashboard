@@ -52,6 +52,7 @@ export default function WorkloadReport({ scorecards }) {
       "SE1": { pkg: "SE1", count: 0, points: 0, label: "SE1 (x0.9)" },
       "SE0": { pkg: "SE0", count: 0, points: 0, label: "SE0 (x0.9)" },
       "E0": { pkg: "E0", count: 0, points: 0, label: "E0 (x0.7)" },
+      "KHAC": { pkg: "KHAC", count: 0, points: 0, label: "Khac (x0.7)" },
       "Unclassified": { pkg: "Unclassified", count: 0, points: 0, label: "Không phân gói (x1.0)" }
     };
 
@@ -101,6 +102,7 @@ export default function WorkloadReport({ scorecards }) {
     SE1: "#f43f5e",               // Rose
     SE0: "#fb923c",               // Orange
     E0: "#a7f3d0",                // Mint
+    KHAC: "#6b7280",              // Gray
     Unclassified: "#6b7280"       // Gray
   };
 

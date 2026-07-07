@@ -118,7 +118,8 @@ export function calculateKPI(designers, tasks, managerInputs, config, catalog) {
       SEM: 0,
       SE1: 0,
       SE0: 0,
-      E0: 0
+      E0: 0,
+      KHAC: 0
     };
 
     dTasks.forEach(t => {

@@ -43,7 +43,7 @@ export default function Dashboard({
       {/* 1. Header Summaries Grid */}
       <div className="grid-stats">
         {/* Stat Card 1 */}
-        <div className="glass-card glow-cyan" style={{ display: "flex", flexDirection: "column", justifyBetween: "space-between" }}>
+        <div className="glass-card glow-cyan" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
           <div>
             <span style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>Team Completed Tasks</span>
             <h3 style={{ fontSize: "2rem", fontWeight: 800, marginTop: "0.25rem", color: "white" }}>{totalTasksSum}</h3>
@@ -54,7 +54,7 @@ export default function Dashboard({
         </div>
 
         {/* Stat Card 2 */}
-        <div className="glass-card glow-purple" style={{ display: "flex", flexDirection: "column", justifyBetween: "space-between" }}>
+        <div className="glass-card glow-purple" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
           <div>
             <span style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>Average Difficulty Coeff</span>
             <h3 style={{ fontSize: "2rem", fontWeight: 800, marginTop: "0.25rem", color: "white" }}>{avgDifficulty.toFixed(2)}</h3>
@@ -65,7 +65,7 @@ export default function Dashboard({
         </div>
 
         {/* Stat Card 3 */}
-        <div className="glass-card" style={{ display: "flex", flexDirection: "column", justifyBetween: "space-between" }}>
+        <div className="glass-card" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
           <div>
             <span style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>Target Completion Rate</span>
             <h3 style={{ fontSize: "2rem", fontWeight: 800, marginTop: "0.25rem", color: "white" }}>
@@ -102,7 +102,7 @@ export default function Dashboard({
       </div>
 
       {/* 2. Scoreboard Filters Bar */}
-      <div className="glass-card" style={{ padding: "1.25rem", display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "center", justifyBetween: "space-between" }}>
+      <div className="glass-card" style={{ padding: "1.25rem", display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", flex: 1 }}>
           {/* Search bar */}
           <div style={{ minWidth: "240px", flex: 1 }}>

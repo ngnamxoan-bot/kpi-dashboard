@@ -9,13 +9,13 @@ export function RadialProgress({ value, size = 160, strokeWidth = 12, label = "K
   const clampedValue = Math.max(0, Math.min(value, 120)); // Allow slightly over 100%
   const offset = circumference - (Math.min(clampedValue, 100) / 100) * circumference;
 
-  // Determine status color
+  // Determine status color based on KPI thresholds
   let color = "var(--danger)";
   let filterId = "glow-red";
-  if (value >= 100) {
+  if (value >= 70) {
     color = "var(--success)";
     filterId = "glow-green";
-  } else if (value >= 85) {
+  } else if (value >= 50) {
     color = "var(--warning)";
     filterId = "glow-yellow";
   }
@@ -77,8 +77,8 @@ export function RadialProgress({ value, size = 160, strokeWidth = 12, label = "K
           r={radius}
           fill="transparent"
           stroke={
-            value >= 100 ? "url(#greenGrad)" :
-            value >= 85 ? "url(#yellowGrad)" : "url(#redGrad)"
+            value >= 70 ? "url(#greenGrad)" :
+            value >= 50 ? "url(#yellowGrad)" : "url(#redGrad)"
           }
           strokeWidth={strokeWidth}
           strokeDasharray={circumference}

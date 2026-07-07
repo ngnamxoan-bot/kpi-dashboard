@@ -48,48 +48,19 @@ export default function DesignerProfile({
     color: packageColors[pkg] || "#64748b"
   })).filter(item => item.value > 0);
 
-  // Group tasks by category
+  // Group tasks by category using the pre-computed category from kpiCalculator
   const categories = {};
   sc.tasks.forEach(task => {
-    // Look up category in title prefix or default
-    // We will just do a simple categorization based on keywords
-    let cat = "Other (Daily/Other)";
-    const title = task.title.toLowerCase();
-    
-    if (title.includes("branding") || title.includes("logo") || title.includes("avatar") || title.includes("cover")) {
-      cat = "Branding";
-    } else if (title.includes("video")) {
-      cat = "Video";
-    } else if (title.includes("menu")) {
-      cat = "Menu";
-    } else if (title.includes("print") || title.includes("flyer") || title.includes("banner") || title.includes("poster") || title.includes("card") || title.includes("sign")) {
-      cat = "Print";
-    } else if (title.includes("fix") || title.includes("sửa lỗi")) {
-      cat = "Fix & Refactor";
-    } else if (title.includes("gift") || title.includes("promotion") || title.includes("voucher") || title.includes("promo")) {
-      cat = "Promo & Gifts";
-    } else if (title.includes("r&d") || title.includes("inhouse")) {
-      cat = "Company Inhouse";
-    }
-
+    const cat = task.category || "Khác";
     categories[cat] = (categories[cat] || 0) + 1;
   });
 
-  const categoryColors = {
-    "Branding": "#00f2fe",
-    "Video": "#9d4edd",
-    "Menu": "#f59e0b",
-    "Print": "#10b981",
-    "Fix & Refactor": "#ef4444",
-    "Promo & Gifts": "#ec4899",
-    "Company Inhouse": "#8b5cf6",
-    "Other (Daily/Other)": "#64748b"
-  };
+  const categoryPalette = ["#00f2fe","#9d4edd","#f59e0b","#10b981","#ef4444","#ec4899","#8b5cf6","#6b7280","#3b82f6","#f97316"];
 
-  const categoryData = Object.keys(categories).map(cat => ({
+  const categoryData = Object.keys(categories).map((cat, idx) => ({
     label: cat,
     value: categories[cat],
-    color: categoryColors[cat] || "#64748b"
+    color: categoryPalette[idx % categoryPalette.length]
   })).sort((a, b) => b.value - a.value);
 
   // 2. Filter tasks table
@@ -170,7 +141,7 @@ export default function DesignerProfile({
         </div>
 
         {/* 1. Quantity points card */}
-        <div className="glass-card" style={{ display: "flex", flexDirection: "column", justifyBetween: "space-between" }}>
+        <div className="glass-card" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
           <div>
             <span style={{ fontSize: "0.7rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Quantity (60%)</span>
             <h4 style={{ fontSize: "1.6rem", fontWeight: 700, margin: "0.25rem 0 0.5rem", color: "white" }}>{sc.diemSoLuong.toFixed(1)} <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: 500 }}>/ 60</span></h4>
@@ -187,7 +158,7 @@ export default function DesignerProfile({
         </div>
 
         {/* 2. Difficulty points card */}
-        <div className="glass-card" style={{ display: "flex", flexDirection: "column", justifyBetween: "space-between" }}>
+        <div className="glass-card" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
           <div>
             <span style={{ fontSize: "0.7rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Difficulty (15%)</span>
             <h4 style={{ fontSize: "1.6rem", fontWeight: 700, margin: "0.25rem 0 0.5rem", color: "white" }}>{sc.diemDoKho.toFixed(1)} <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: 500 }}>/ 15</span></h4>
@@ -204,7 +175,7 @@ export default function DesignerProfile({
         </div>
 
         {/* 3. Quality points card */}
-        <div className="glass-card" style={{ display: "flex", flexDirection: "column", justifyBetween: "space-between" }}>
+        <div className="glass-card" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
           <div>
             <span style={{ fontSize: "0.7rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Quality (15%)</span>
             <h4 style={{ fontSize: "1.6rem", fontWeight: 700, margin: "0.25rem 0 0.5rem", color: "white" }}>
@@ -223,7 +194,7 @@ export default function DesignerProfile({
         </div>
 
         {/* 4. Bonus / Penalty card */}
-        <div className="glass-card" style={{ display: "flex", flexDirection: "column", justifyBetween: "space-between" }}>
+        <div className="glass-card" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
           <div>
             <span style={{ fontSize: "0.7rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Bonus & Penalties</span>
             <h4 style={{ 
@@ -353,7 +324,7 @@ export default function DesignerProfile({
                   return (
                     <tr key={idx}>
                       <td style={{ textAlign: "center", color: "var(--text-muted)", fontSize: "0.8rem" }}>
-                        {(activePage - 1) * sizeVal + idx + 1}
+                        {isAll ? idx + 1 : (activePage - 1) * sizeVal + idx + 1}
                       </td>
                       <td style={{ fontWeight: 500 }}>{task.title}</td>
                       <td style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>{task.project}</td>

@@ -27,7 +27,7 @@ export default function ConfigPanel({
   const handleGeneralChange = (key, val) => {
     setConfig(prev => ({
       ...prev,
-      [key]: Number(val)
+      [key]: key === "managerPassword" ? val : Number(val)
     }));
   };
 

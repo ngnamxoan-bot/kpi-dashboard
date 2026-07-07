@@ -1,104 +1,49 @@
 import { supabase } from "./supabase";
 
-// ─── Config ──────────────────────────────────────────────────────────────────
-
-function dbRowToConfig(row) {
-  return {
-    weights: row.weights,
-    targetPoints: Number(row.target_points),
-    warningThreshold: Number(row.warning_threshold),
-    coefficients: row.coefficients,
-    hsMin: Number(row.hs_min),
-    hsMax: Number(row.hs_max),
-    hsDefault: Number(row.hs_default),
-    penaltyTask: Number(row.penalty_task),
-    penaltyDay: Number(row.penalty_day),
-    dailyPostPoints: Number(row.daily_post_points),
-    otherPoints: Number(row.other_points),
-    managerPassword: row.manager_password,
-  };
-}
-
-function configToDbRow(cfg) {
-  return {
-    id: 1,
-    weights: cfg.weights,
-    target_points: cfg.targetPoints,
-    warning_threshold: cfg.warningThreshold,
-    coefficients: cfg.coefficients,
-    hs_min: cfg.hsMin,
-    hs_max: cfg.hsMax,
-    hs_default: cfg.hsDefault,
-    penalty_task: cfg.penaltyTask,
-    penalty_day: cfg.penaltyDay,
-    daily_post_points: cfg.dailyPostPoints,
-    other_points: cfg.otherPoints,
-    manager_password: cfg.managerPassword,
-    updated_at: new Date().toISOString(),
-  };
-}
+// ─── Config ───────────────────────────────────────────────────────────────────
 
 export async function fetchConfig() {
   const { data, error } = await supabase
     .from("kpi_config")
-    .select("*")
-    .eq("id", 1)
+    .select("value")
+    .eq("key", "main")
     .maybeSingle();
   if (error) throw error;
-  return data ? dbRowToConfig(data) : null;
+  return data?.value || null;
 }
 
-export async function saveConfig(cfg) {
+export async function saveConfig(config) {
   const { error } = await supabase
     .from("kpi_config")
-    .upsert(configToDbRow(cfg), { onConflict: "id" });
+    .upsert({ key: "main", value: config }, { onConflict: "key" });
   if (error) throw error;
 }
 
-// ─── Catalog ─────────────────────────────────────────────────────────────────
-
-function dbRowToCatalogItem(row) {
-  return {
-    id: row.id,
-    category: row.category,
-    type: row.type,
-    points: Number(row.points),
-    base: row.base || "",
-  };
-}
+// ─── Catalog ──────────────────────────────────────────────────────────────────
 
 export async function fetchCatalog() {
   const { data, error } = await supabase
     .from("kpi_catalog")
     .select("*")
-    .order("sort_order", { ascending: true });
+    .order("id", { ascending: true });
   if (error) throw error;
-  return (data || []).map(dbRowToCatalogItem);
+  return data || [];
 }
 
 export async function saveCatalog(catalog) {
-  // Delete all existing rows then re-insert (catalog is small, ~25 rows)
   const { error: delError } = await supabase
     .from("kpi_catalog")
     .delete()
-    .neq("id", "00000000-0000-0000-0000-000000000000"); // delete all
+    .neq("id", 0);
   if (delError) throw delError;
 
   if (catalog.length === 0) return;
-
-  const rows = catalog.map((item, idx) => ({
-    category: item.category,
-    type: item.type,
-    points: item.points,
-    base: item.base || null,
-    sort_order: idx,
-  }));
-
+  const rows = catalog.map(({ name, type, points, base }) => ({ name, type, points, base }));
   const { error } = await supabase.from("kpi_catalog").insert(rows);
   if (error) throw error;
 }
 
-// ─── Months ──────────────────────────────────────────────────────────────────
+// ─── Months ───────────────────────────────────────────────────────────────────
 
 export async function fetchMonths() {
   const { data, error } = await supabase
@@ -106,11 +51,8 @@ export async function fetchMonths() {
     .select("key, label")
     .order("key", { ascending: true });
   if (error) throw error;
-  // Return as { key: { label } } map
   const map = {};
-  (data || []).forEach((row) => {
-    map[row.key] = { label: row.label };
-  });
+  for (const row of data || []) map[row.key] = { label: row.label };
   return map;
 }
 
@@ -121,7 +63,7 @@ export async function ensureMonth(key, label) {
   if (error) throw error;
 }
 
-// ─── Tasks ───────────────────────────────────────────────────────────────────
+// ─── Tasks ────────────────────────────────────────────────────────────────────
 
 export async function fetchTasks(monthKey) {
   const PAGE = 1000;
@@ -148,11 +90,9 @@ export async function fetchTasks(monthKey) {
   }));
 }
 
-export async function importTasks(monthKey, label, tasks) {
-  // Ensure the month row exists first
-  await ensureMonth(monthKey, label);
+export async function importTasks(monthKey, monthLabel, tasks) {
+  await ensureMonth(monthKey, monthLabel);
 
-  // Delete existing tasks for this month
   const { error: delError } = await supabase
     .from("kpi_tasks")
     .delete()
@@ -160,15 +100,13 @@ export async function importTasks(monthKey, label, tasks) {
   if (delError) throw delError;
 
   if (tasks.length === 0) return;
-
-  // Batch insert in chunks of 500
   const CHUNK = 500;
   for (let i = 0; i < tasks.length; i += CHUNK) {
     const chunk = tasks.slice(i, i + CHUNK).map((t) => ({
       month_key: monthKey,
-      title: t.title || "",
-      assignee: t.assignee || "",
-      project: t.project || "",
+      title: t.title,
+      assignee: t.assignee,
+      project: t.project,
       package: t.package || null,
     }));
     const { error } = await supabase.from("kpi_tasks").insert(chunk);
@@ -176,60 +114,44 @@ export async function importTasks(monthKey, label, tasks) {
   }
 }
 
-// ─── Manager Inputs ──────────────────────────────────────────────────────────
+// ─── Manager Inputs ───────────────────────────────────────────────────────────
 
 export async function fetchManagerInputs(monthKey) {
   const { data, error } = await supabase
     .from("kpi_manager_inputs")
-    .select("designer_name, quality, late_tasks, late_days, bonus, bonus_notes")
+    .select("assignee, inputs")
     .eq("month_key", monthKey);
   if (error) throw error;
-
   const map = {};
-  (data || []).forEach((row) => {
-    map[row.designer_name] = {
-      quality: row.quality !== null ? Number(row.quality) : null,
-      lateTasks: Number(row.late_tasks),
-      lateDays: Number(row.late_days),
-      bonus: Number(row.bonus),
-      bonusNotes: row.bonus_notes || "",
-    };
-  });
+  for (const row of data || []) map[row.assignee] = row.inputs;
   return map;
 }
 
-export async function saveManagerInput(monthKey, designerName, inputs) {
-  const { error } = await supabase.from("kpi_manager_inputs").upsert(
-    {
-      month_key: monthKey,
-      designer_name: designerName,
-      quality: inputs.quality !== null && inputs.quality !== "" ? Number(inputs.quality) : null,
-      late_tasks: Number(inputs.lateTasks) || 0,
-      late_days: Number(inputs.lateDays) || 0,
-      bonus: Number(inputs.bonus) || 0,
-      bonus_notes: inputs.bonusNotes || "",
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: "month_key,designer_name" }
-  );
+export async function saveManagerInput(monthKey, assignee, inputs) {
+  const { error } = await supabase
+    .from("kpi_manager_inputs")
+    .upsert({ month_key: monthKey, assignee, inputs }, { onConflict: "month_key,assignee" });
   if (error) throw error;
 }
 
-// ─── Seed (first-time setup) ─────────────────────────────────────────────────
+// ─── Seed ─────────────────────────────────────────────────────────────────────
 
-export async function seedDefaultData(defaultConfig, defaultCatalog, defaultTasks, defaultManagers, monthKey, monthLabel) {
-  // Seed config
+export async function seedDefaultData(
+  defaultConfig,
+  defaultCatalog,
+  monthKey,
+  monthLabel,
+  defaultTasks,
+  defaultManagers
+) {
   await saveConfig(defaultConfig);
 
-  // Seed catalog
-  await saveCatalog(defaultCatalog);
-
-  // Seed month + tasks + manager inputs
-  await ensureMonth(monthKey, monthLabel);
+  const rows = defaultCatalog.map(({ name, type, points, base }) => ({ name, type, points, base }));
+  const { error: catErr } = await supabase.from("kpi_catalog").insert(rows);
+  if (catErr) throw catErr;
 
   await importTasks(monthKey, monthLabel, defaultTasks);
 
-  // Seed manager inputs
   for (const [name, inputs] of Object.entries(defaultManagers)) {
     await saveManagerInput(monthKey, name, inputs);
   }

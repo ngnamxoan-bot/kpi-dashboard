@@ -1,18 +1,23 @@
 import React, { useState } from "react";
 
-export default function ConfigPanel({ 
-  config, 
-  setConfig, 
-  catalog, 
-  setCatalog 
+export default function ConfigPanel({
+  config,
+  setConfig,
+  catalog,
+  setCatalog,
+  onClearAllData,
+  isSaving
 }) {
   const [activeSubTab, setActiveSubTab] = useState("general");
-  
+
   // Local state for adding a new catalog row
   const [newCatName, setNewCatName] = useState("");
   const [newCatType, setNewCatType] = useState("");
   const [newCatPoints, setNewCatPoints] = useState(2.0);
   const [newCatBase, setNewCatBase] = useState("");
+
+  const [showDangerConfirm, setShowDangerConfirm] = useState(false);
+  const [confirmText, setConfirmText] = useState("");
 
   const handleWeightChange = (key, val) => {
     setConfig(prev => ({
@@ -272,6 +277,99 @@ export default function ConfigPanel({
                 />
                 <span style={{ fontSize: "0.65rem", color: "var(--text-muted)" }}>Password required to unlock editing, CSV imports, and config changes</span>
               </div>
+            </div>
+
+            {/* Danger Zone */}
+            <div style={{
+              border: "1px solid rgba(239,68,68,0.35)",
+              background: "rgba(239,68,68,0.04)",
+              borderRadius: "12px",
+              padding: "1.5rem",
+              display: "flex",
+              flexDirection: "column",
+              gap: "1rem",
+              marginTop: "0.5rem"
+            }}>
+              <div>
+                <h4 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--danger)", marginBottom: "0.4rem" }}>
+                  ⚠️ Vùng nguy hiểm
+                </h4>
+                <p style={{ fontSize: "0.8rem", color: "var(--text-secondary)", lineHeight: 1.7 }}>
+                  Xoá toàn bộ tháng, task và đánh giá quản lý trong database. Cấu hình và bảng điểm được giữ nguyên. Hành động này không thể hoàn tác.
+                </p>
+              </div>
+
+              {!showDangerConfirm ? (
+                <button
+                  onClick={() => { setShowDangerConfirm(true); setConfirmText(""); }}
+                  style={{
+                    alignSelf: "flex-start",
+                    background: "rgba(239,68,68,0.1)",
+                    border: "1px solid rgba(239,68,68,0.4)",
+                    color: "var(--danger)",
+                    borderRadius: "8px",
+                    padding: "0.55rem 1.1rem",
+                    fontSize: "0.85rem",
+                    fontWeight: 600,
+                    cursor: "pointer"
+                  }}
+                >
+                  🗑 Xoá toàn bộ dữ liệu
+                </button>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                  <p style={{ fontSize: "0.8rem", color: "var(--danger)", fontWeight: 600 }}>
+                    Gõ <strong>XOA</strong> để xác nhận:
+                  </p>
+                  <input
+                    type="text"
+                    value={confirmText}
+                    onChange={(e) => setConfirmText(e.target.value)}
+                    placeholder="Gõ XOA ở đây..."
+                    className="form-input"
+                    style={{ maxWidth: "260px", fontFamily: "monospace", fontWeight: 700 }}
+                    autoFocus
+                  />
+                  <div style={{ display: "flex", gap: "0.75rem" }}>
+                    <button
+                      disabled={confirmText !== "XOA" || isSaving}
+                      onClick={() => {
+                        onClearAllData();
+                        setShowDangerConfirm(false);
+                        setConfirmText("");
+                      }}
+                      style={{
+                        background: confirmText === "XOA" && !isSaving ? "var(--danger)" : "rgba(239,68,68,0.3)",
+                        border: "none",
+                        color: "white",
+                        borderRadius: "8px",
+                        padding: "0.55rem 1.1rem",
+                        fontSize: "0.85rem",
+                        fontWeight: 700,
+                        cursor: confirmText === "XOA" && !isSaving ? "pointer" : "not-allowed",
+                        opacity: confirmText === "XOA" && !isSaving ? 1 : 0.6
+                      }}
+                    >
+                      {isSaving ? "Đang xoá…" : "Xác nhận xoá"}
+                    </button>
+                    <button
+                      onClick={() => { setShowDangerConfirm(false); setConfirmText(""); }}
+                      style={{
+                        background: "transparent",
+                        border: "1px solid var(--border-muted)",
+                        color: "var(--text-secondary)",
+                        borderRadius: "8px",
+                        padding: "0.55rem 1.1rem",
+                        fontSize: "0.85rem",
+                        fontWeight: 600,
+                        cursor: "pointer"
+                      }}
+                    >
+                      Huỷ
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}

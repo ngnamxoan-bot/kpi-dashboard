@@ -223,3 +223,13 @@ export async function seedDefaultData(defaultConfig, defaultCatalog, defaultTask
     await saveManagerInput(monthKey, name, inputs);
   }
 }
+
+// ─── Clear All Data ───────────────────────────────────────────────────────────
+
+export async function clearAllData() {
+  const { error } = await supabase
+    .from("kpi_months")
+    .delete()
+    .neq("key", "");
+  if (error) throw error;
+}

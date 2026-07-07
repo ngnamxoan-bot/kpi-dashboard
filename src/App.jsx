@@ -26,6 +26,7 @@ import {
   importTasks,
   saveManagerInput,
   seedDefaultData,
+  clearAllData,
 } from "./lib/db";
 
 const DEFAULT_MONTH_KEY = "2026-06";
@@ -266,6 +267,23 @@ export default function App() {
     }
   };
 
+  const handleClearAllData = async () => {
+    if (isSaving) return;
+    setIsSaving(true);
+    try {
+      await clearAllData();
+      setMonthsData({ [DEFAULT_MONTH_KEY]: { label: DEFAULT_MONTH_LABEL } });
+      setMonthCache({ [DEFAULT_MONTH_KEY]: { tasks: [], managerInputs: {} } });
+      setCurrentMonthKey(DEFAULT_MONTH_KEY);
+      setActiveTab("import");
+      showToast("Đã xoá toàn bộ dữ liệu task. Hãy import CSV mới!");
+    } catch (err) {
+      showToast("Lỗi xoá dữ liệu: " + err.message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleViewProfile = (name) => {
     setSelectedDesignerName(name);
     setActiveTab("profiles");
@@ -460,6 +478,8 @@ export default function App() {
           setConfig={setConfig}
           catalog={catalog}
           setCatalog={setCatalog}
+          onClearAllData={handleClearAllData}
+          isSaving={isSaving}
         />
       )}
 

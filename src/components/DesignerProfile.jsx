@@ -39,6 +39,7 @@ export default function DesignerProfile({
     PROX3: "#9d4edd",
     SEM: "#c8b6ff",
     SE1: "#f59e0b",
+    SE0: "#fb923c",
     E0: "#ef4444"
   };
 
@@ -300,6 +301,7 @@ export default function DesignerProfile({
               <option value="PROX3">PROX3</option>
               <option value="SEM">SEM</option>
               <option value="SE1">SE1</option>
+              <option value="SE0">SE0</option>
               <option value="E0">E0</option>
               <option value="null">Unclassified</option>
             </select>

@@ -117,6 +117,7 @@ export function calculateKPI(designers, tasks, managerInputs, config, catalog) {
       PROX3: 0,
       SEM: 0,
       SE1: 0,
+      SE0: 0,
       E0: 0
     };
 

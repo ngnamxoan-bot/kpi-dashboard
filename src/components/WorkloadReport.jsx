@@ -50,6 +50,7 @@ export default function WorkloadReport({ scorecards }) {
       "PROX3": { pkg: "PROX3", count: 0, points: 0, label: "PROX3 (x1.1)" },
       "SEM": { pkg: "SEM", count: 0, points: 0, label: "SEM (x1.0)" },
       "SE1": { pkg: "SE1", count: 0, points: 0, label: "SE1 (x0.9)" },
+      "SE0": { pkg: "SE0", count: 0, points: 0, label: "SE0 (x0.9)" },
       "E0": { pkg: "E0", count: 0, points: 0, label: "E0 (x0.7)" },
       "Unclassified": { pkg: "Unclassified", count: 0, points: 0, label: "Không phân gói (x1.0)" }
     };
@@ -98,6 +99,7 @@ export default function WorkloadReport({ scorecards }) {
     PROX3: "var(--success)",      // Green
     SEM: "var(--warning)",        // Orange
     SE1: "#f43f5e",               // Rose
+    SE0: "#fb923c",               // Orange
     E0: "#a7f3d0",                // Mint
     Unclassified: "#6b7280"       // Gray
   };

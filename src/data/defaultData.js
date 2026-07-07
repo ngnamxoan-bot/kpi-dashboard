@@ -15,6 +15,7 @@ export const DEFAULT_CONFIG = {
     "PROX3": 1.1,
     "SEM": 1.0,
     "SE1": 0.9,
+    "SE0": 0.9,
     "E0": 0.7
   },
   "hsMin": 0.7,

@@ -136,6 +136,7 @@ export default function CSVImporter({
           else if (projUpper.includes("PROX3")) pkg = "PROX3";
           else if (projUpper.includes("SEM")) pkg = "SEM";
           else if (projUpper.includes("SE1")) pkg = "SE1";
+          else if (projUpper.includes("SE0")) pkg = "SE0";
           else if (projUpper.includes("E0")) pkg = "E0";
         }
 

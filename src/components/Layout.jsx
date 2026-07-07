@@ -40,11 +40,11 @@ const IconReport = () => (
   </svg>
 );
 
-export default function Layout({ 
-  children, 
-  activeTab, 
-  setActiveTab, 
-  totalTasks, 
+export default function Layout({
+  children,
+  activeTab,
+  setActiveTab,
+  totalTasks,
   targetPoints,
   currentMonthKey,
   setCurrentMonthKey,
@@ -52,7 +52,8 @@ export default function Layout({
   isManager,
   onLoginClick,
   onLogout,
-  onManualSave
+  onManualSave,
+  isSaving
 }) {
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: <IconDashboard /> },
@@ -230,6 +231,7 @@ export default function Layout({
             {/* Manual Save Button */}
             <button
               onClick={onManualSave}
+              disabled={isSaving}
               className="btn btn-primary"
               style={{
                 padding: "0.5rem 1rem",
@@ -240,7 +242,8 @@ export default function Layout({
                 background: "linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%)",
                 boxShadow: "0 0 10px 0 var(--secondary-glow)",
                 border: "none",
-                cursor: "pointer"
+                cursor: isSaving ? "not-allowed" : "pointer",
+                opacity: isSaving ? 0.7 : 1
               }}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -248,7 +251,7 @@ export default function Layout({
                 <polyline points="17 21 17 13 7 13 7 21" />
                 <polyline points="7 3 7 8 15 8" />
               </svg>
-              Lưu dữ liệu
+              {isSaving ? "Đang lưu…" : "Lưu dữ liệu"}
             </button>
 
             {/* Quick Stat Badge */}

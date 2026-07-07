@@ -39,11 +39,12 @@ function parseCSV(text) {
   return lines;
 }
 
-export default function CSVImporter({ 
-  onImportTasks, 
+export default function CSVImporter({
+  onImportTasks,
   officialDesigners,
   config,
-  monthsData
+  monthsData,
+  isSaving
 }) {
   const [csvText, setCsvText] = useState("");
   const [parsedPreview, setParsedPreview] = useState(null);
@@ -364,8 +365,8 @@ export default function CSVImporter({
               <h3 style={{ fontSize: "1.1rem", fontWeight: 700 }}>Data Parsing Summary</h3>
               <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Parsed from: {fileName}</span>
             </div>
-            <button onClick={handleApply} className="btn btn-primary">
-              Apply Data to Scoreboard
+            <button onClick={handleApply} disabled={isSaving} className="btn btn-primary" style={{ opacity: isSaving ? 0.7 : 1, cursor: isSaving ? "not-allowed" : "pointer" }}>
+              {isSaving ? "Đang lưu lên Supabase…" : "Apply Data to Scoreboard"}
             </button>
           </div>
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Layout from "./components/Layout";
 import Dashboard from "./components/Dashboard";
 import DesignerProfile from "./components/DesignerProfile";
@@ -7,17 +7,36 @@ import ConfigPanel from "./components/ConfigPanel";
 import ManagerInputModal from "./components/ManagerInputModal";
 import WorkloadReport from "./components/WorkloadReport";
 
-// Initial static data and calculation utility
-import { 
-  DEFAULT_CONFIG, 
-  DEFAULT_CATALOG, 
-  DEFAULT_DESIGNERS, 
-  DEFAULT_TASKS, 
-  DEFAULT_MANAGER_INPUTS 
+import {
+  DEFAULT_CONFIG,
+  DEFAULT_CATALOG,
+  DEFAULT_DESIGNERS,
+  DEFAULT_TASKS,
+  DEFAULT_MANAGER_INPUTS,
 } from "./data/defaultData";
 import { calculateKPI } from "./utils/kpiCalculator";
+import {
+  fetchConfig,
+  saveConfig,
+  fetchCatalog,
+  saveCatalog,
+  fetchMonths,
+  fetchTasks,
+  fetchManagerInputs,
+  importTasks,
+  saveManagerInput,
+  seedDefaultData,
+} from "./lib/db";
+
+const DEFAULT_MONTH_KEY = "2026-06";
+const DEFAULT_MONTH_LABEL = "Tháng 06/2026";
 
 export default function App() {
+  // ── Loading / error state ─────────────────────────────────────────────────
+  const [dbStatus, setDbStatus] = useState("loading"); // "loading" | "seeding" | "ready" | "error"
+  const [dbError, setDbError] = useState("");
+
+  // ── Core app state ────────────────────────────────────────────────────────
   const [activeTab, setActiveTab] = useState("dashboard");
   const [selectedDesignerName, setSelectedDesignerName] = useState("Helia");
   const [editingDesignerName, setEditingDesignerName] = useState(null);
@@ -28,97 +47,155 @@ export default function App() {
   const [loginError, setLoginError] = useState("");
 
   const [toastMsg, setToastMsg] = useState("");
-  const showToast = (msg) => {
+
+  const [config, setConfig] = useState(DEFAULT_CONFIG);
+  const [catalog, setCatalog] = useState(DEFAULT_CATALOG);
+  const [currentMonthKey, setCurrentMonthKey] = useState(DEFAULT_MONTH_KEY);
+  const [monthsData, setMonthsData] = useState({});
+
+  // Per-month task + managerInputs cache: { [monthKey]: { tasks, managerInputs } }
+  const [monthCache, setMonthCache] = useState({});
+
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Debounce refs for auto-save
+  const configSaveTimer = useRef(null);
+  const catalogSaveTimer = useRef(null);
+
+  // ── Toast helper ─────────────────────────────────────────────────────────
+  const showToast = useCallback((msg) => {
     setToastMsg(msg);
-    setTimeout(() => {
-      setToastMsg("");
-    }, 3000);
-  };
+    setTimeout(() => setToastMsg(""), 3000);
+  }, []);
 
-  // Core state with local storage fallback
-  const [config, setConfig] = useState(() => {
-    const saved = localStorage.getItem("kpi_config");
-    const parsed = saved ? JSON.parse(saved) : DEFAULT_CONFIG;
-    if (!parsed.managerPassword) {
-      parsed.managerPassword = "macmedia123";
-    }
-    return parsed;
-  });
+  // ── Initial load from Supabase ────────────────────────────────────────────
+  useEffect(() => {
+    let cancelled = false;
 
-  const [catalog, setCatalog] = useState(() => {
-    const saved = localStorage.getItem("kpi_catalog");
-    return saved ? JSON.parse(saved) : DEFAULT_CATALOG;
-  });
+    async function init() {
+      try {
+        // 1. Check if config exists – if not, seed defaults
+        let cfg = await fetchConfig();
+        const needsSeed = !cfg;
 
-  const [currentMonthKey, setCurrentMonthKey] = useState(() => {
-    const saved = localStorage.getItem("kpi_current_month_key");
-    return saved || "2026-06";
-  });
-
-  const [monthsData, setMonthsData] = useState(() => {
-    const saved = localStorage.getItem("kpi_months_data");
-    if (saved) {
-      return JSON.parse(saved);
-    }
-    // Migration fallback for old single-month database
-    const oldTasks = localStorage.getItem("kpi_tasks");
-    const oldInputs = localStorage.getItem("kpi_manager_inputs");
-    if (oldTasks || oldInputs) {
-      return {
-        "2026-06": {
-          label: "Tháng 06/2026",
-          tasks: oldTasks ? JSON.parse(oldTasks) : DEFAULT_TASKS,
-          managerInputs: oldInputs ? JSON.parse(oldInputs) : DEFAULT_MANAGER_INPUTS
+        if (needsSeed) {
+          setDbStatus("seeding");
+          await seedDefaultData(
+            DEFAULT_CONFIG,
+            DEFAULT_CATALOG,
+            DEFAULT_TASKS,
+            DEFAULT_MANAGER_INPUTS,
+            DEFAULT_MONTH_KEY,
+            DEFAULT_MONTH_LABEL
+          );
+          cfg = DEFAULT_CONFIG;
         }
-      };
-    }
-    // Initialize with June 2026 default data
-    return {
-      "2026-06": {
-        label: "Tháng 06/2026",
-        tasks: DEFAULT_TASKS,
-        managerInputs: DEFAULT_MANAGER_INPUTS
+
+        // 2. Load catalog and months in parallel
+        const [cat, months] = await Promise.all([fetchCatalog(), fetchMonths()]);
+
+        if (cancelled) return;
+
+        setConfig(cfg);
+        setCatalog(cat.length > 0 ? cat : DEFAULT_CATALOG);
+
+        const resolvedMonths =
+          Object.keys(months).length > 0
+            ? months
+            : { [DEFAULT_MONTH_KEY]: { label: DEFAULT_MONTH_LABEL } };
+        setMonthsData(resolvedMonths);
+
+        // 3. Load data for the latest month
+        const monthKeys = Object.keys(resolvedMonths).sort();
+        const activeKey = monthKeys[monthKeys.length - 1];
+        setCurrentMonthKey(activeKey);
+
+        const [tasks, managerInputs] = await Promise.all([
+          fetchTasks(activeKey),
+          fetchManagerInputs(activeKey),
+        ]);
+
+        if (cancelled) return;
+
+        setMonthCache({ [activeKey]: { tasks, managerInputs } });
+        setDbStatus("ready");
+      } catch (err) {
+        if (!cancelled) {
+          console.error("DB init error:", err);
+          setDbError(err.message || String(err));
+          setDbStatus("error");
+        }
       }
+    }
+
+    init();
+    return () => {
+      cancelled = true;
     };
-  });
+  }, []);
 
-  // Save to localStorage on changes
+  // ── Load month data when switching months ─────────────────────────────────
   useEffect(() => {
-    localStorage.setItem("kpi_config", JSON.stringify(config));
-  }, [config]);
+    if (dbStatus !== "ready") return;
+    if (monthCache[currentMonthKey]) return;
 
+    let cancelled = false;
+    async function loadMonth() {
+      try {
+        const [tasks, managerInputs] = await Promise.all([
+          fetchTasks(currentMonthKey),
+          fetchManagerInputs(currentMonthKey),
+        ]);
+        if (cancelled) return;
+        setMonthCache((prev) => ({
+          ...prev,
+          [currentMonthKey]: { tasks, managerInputs },
+        }));
+      } catch (err) {
+        console.error("Error loading month:", err);
+        showToast("Lỗi tải dữ liệu tháng: " + err.message);
+      }
+    }
+    loadMonth();
+    return () => {
+      cancelled = true;
+    };
+  }, [currentMonthKey, dbStatus, monthCache, showToast]);
+
+  // ── Auto-save config (debounced 1s after change) ──────────────────────────
   useEffect(() => {
-    localStorage.setItem("kpi_catalog", JSON.stringify(catalog));
-  }, [catalog]);
+    if (dbStatus !== "ready") return;
+    clearTimeout(configSaveTimer.current);
+    configSaveTimer.current = setTimeout(async () => {
+      try { await saveConfig(config); } catch (e) { console.error(e); }
+    }, 1000);
+    return () => clearTimeout(configSaveTimer.current);
+  }, [config, dbStatus]);
 
+  // ── Auto-save catalog (debounced 1s after change) ─────────────────────────
   useEffect(() => {
-    localStorage.setItem("kpi_current_month_key", currentMonthKey);
-  }, [currentMonthKey]);
+    if (dbStatus !== "ready") return;
+    clearTimeout(catalogSaveTimer.current);
+    catalogSaveTimer.current = setTimeout(async () => {
+      try { await saveCatalog(catalog); } catch (e) { console.error(e); }
+    }, 1000);
+    return () => clearTimeout(catalogSaveTimer.current);
+  }, [catalog, dbStatus]);
 
-  useEffect(() => {
-    localStorage.setItem("kpi_months_data", JSON.stringify(monthsData));
-  }, [monthsData]);
+  // ── Derived values ────────────────────────────────────────────────────────
+  const activeMonthData = monthCache[currentMonthKey] || { tasks: [], managerInputs: {} };
 
-  // Perform KPI Calculations dynamically
-  const activeMonth = (monthsData && monthsData[currentMonthKey]) || { tasks: [], managerInputs: {} };
-  
   const scorecards = calculateKPI(
     DEFAULT_DESIGNERS,
-    activeMonth.tasks || [],
-    activeMonth.managerInputs || {},
+    activeMonthData.tasks,
+    activeMonthData.managerInputs,
     config,
     catalog
   );
 
-  // Total tasks count for current month
-  const totalTasksCount = activeMonth.tasks ? activeMonth.tasks.length : 0;
-  const activeManagerInputs = activeMonth.managerInputs || {};
+  const totalTasksCount = activeMonthData.tasks.length;
 
-  // Actions
-  const handleEditDesigner = (name) => {
-    setEditingDesignerName(name);
-  };
-
+  // ── Action handlers ───────────────────────────────────────────────────────
   const handleLoginSubmit = () => {
     const correctPassword = config.managerPassword || "macmedia123";
     if (loginPassword === correctPassword) {
@@ -126,72 +203,67 @@ export default function App() {
       setShowLoginModal(false);
       setLoginPassword("");
       setLoginError("");
-      showToast("🔓 Đã đăng nhập quản trị thành công!");
+      showToast("Đã đăng nhập quản trị thành công!");
     } else {
-      setLoginError("Incorrect password. Please try again.");
+      setLoginError("Sai mật khẩu. Vui lòng thử lại.");
     }
   };
 
-  const handleManualSave = () => {
-    localStorage.setItem("kpi_config", JSON.stringify(config));
-    localStorage.setItem("kpi_catalog", JSON.stringify(catalog));
-    localStorage.setItem("kpi_current_month_key", currentMonthKey);
-    localStorage.setItem("kpi_months_data", JSON.stringify(monthsData));
-    showToast("💾 Đã lưu toàn bộ cấu hình và dữ liệu thành công!");
+  const handleManualSave = async () => {
+    if (isSaving) return;
+    setIsSaving(true);
+    try {
+      await Promise.all([saveConfig(config), saveCatalog(catalog)]);
+      showToast("Đã lưu toàn bộ cấu hình thành công!");
+    } catch (err) {
+      showToast("Lỗi lưu dữ liệu: " + err.message);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleSaveManagerInputs = (name, inputs) => {
-    setMonthsData(prev => ({
-      ...prev,
-      [currentMonthKey]: {
-        ...prev[currentMonthKey],
-        managerInputs: {
-          ...(prev[currentMonthKey]?.managerInputs || {}),
-          [name]: inputs
-        }
-      }
-    }));
-    setEditingDesignerName(null);
-  };
-
-  const createDefaultManagerInputs = () => {
-    const inputs = {};
-    DEFAULT_DESIGNERS.forEach(d => {
-      inputs[d.name] = {
-        quality: null,
-        lateTasks: 0,
-        lateDays: 0,
-        bonus: 0,
-        bonusNotes: ""
-      };
-    });
-    return inputs;
-  };
-
-  const handleImportTasks = (monthKey, label, newTasks, newIgnored) => {
-    setMonthsData(prev => {
-      const existingInputs = prev[monthKey]?.managerInputs;
-      const initialInputs = existingInputs || createDefaultManagerInputs();
-
-      return {
+  const handleSaveManagerInputs = async (name, inputs) => {
+    try {
+      await saveManagerInput(currentMonthKey, name, inputs);
+      setMonthCache((prev) => ({
         ...prev,
-        [monthKey]: {
-          label,
-          tasks: newTasks,
-          managerInputs: initialInputs
-        }
-      };
-    });
-    
-    setCurrentMonthKey(monthKey);
-
-    // Select first designer as default profile view
-    if (DEFAULT_DESIGNERS.length > 0) {
-      setSelectedDesignerName(DEFAULT_DESIGNERS[0].name);
+        [currentMonthKey]: {
+          ...prev[currentMonthKey],
+          managerInputs: {
+            ...(prev[currentMonthKey]?.managerInputs || {}),
+            [name]: inputs,
+          },
+        },
+      }));
+      setEditingDesignerName(null);
+      showToast(`Đã lưu đánh giá cho ${name}`);
+    } catch (err) {
+      showToast("Lỗi lưu đánh giá: " + err.message);
     }
-    
-    // Navigate back to Dashboard to see updated results
-    setActiveTab("dashboard");
+  };
+
+  const handleImportTasks = async (monthKey, label, newTasks) => {
+    try {
+      setIsSaving(true);
+      await importTasks(monthKey, label, newTasks);
+
+      const [months, tasks, managerInputs] = await Promise.all([
+        fetchMonths(),
+        fetchTasks(monthKey),
+        fetchManagerInputs(monthKey),
+      ]);
+
+      setMonthsData(months);
+      setMonthCache((prev) => ({ ...prev, [monthKey]: { tasks, managerInputs } }));
+      setCurrentMonthKey(monthKey);
+      setSelectedDesignerName(DEFAULT_DESIGNERS[0]?.name || "");
+      setActiveTab("dashboard");
+      showToast(`Đã import ${newTasks.length} task cho ${label}!`);
+    } catch (err) {
+      showToast("Lỗi import: " + err.message);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleViewProfile = (name) => {
@@ -199,80 +271,124 @@ export default function App() {
     setActiveTab("profiles");
   };
 
-  // Export computed KPI scorecard back to CSV
   const exportToCSV = () => {
     const headers = [
-      "Hạng",
-      "Designer",
-      "Nhóm",
-      "Tổng số task",
-      "Tổng điểm thô (loại task)",
-      "PROX5",
-      "PROX4",
-      "PROX3",
-      "SEM",
-      "SE1",
-      "E0",
-      "Đã phân loại gói",
-      "Hệ số độ khó TB",
-      "Điểm số lượng",
-      "Điểm độ khó",
-      "Chất lượng TB (1-5)",
-      "Điểm chất lượng",
-      "Số task trễ hạn",
-      "Tổng ngày trễ",
-      "Điểm bonus",
-      "Ghi chú bonus",
-      "Điểm bonus/trễ",
-      "TỔNG ĐIỂM KPI (%)",
-      "Trạng thái"
+      "Hạng","Designer","Nhóm","Tổng số task","Tổng điểm thô",
+      "PROX5","PROX4","PROX3","SEM","SE1","E0","Đã phân loại gói",
+      "Hệ số độ khó TB","Điểm số lượng","Điểm độ khó",
+      "Chất lượng TB (1-3)","Điểm chất lượng",
+      "Số task trễ hạn","Tổng ngày trễ","Điểm bonus","Ghi chú bonus",
+      "Điểm bonus/trễ","TỔNG ĐIỂM KPI (%)","Trạng thái",
     ];
-
-    const rows = scorecards.map(sc => [
-      sc.rank,
-      sc.designerName,
-      sc.group,
-      sc.totalTasks,
+    const rows = scorecards.map((sc) => [
+      sc.rank, sc.designerName, sc.group, sc.totalTasks,
       sc.totalPointsTho.toFixed(1),
-      sc.packageCounts.PROX5,
-      sc.packageCounts.PROX4,
-      sc.packageCounts.PROX3,
-      sc.packageCounts.SEM,
-      sc.packageCounts.SE1,
-      sc.packageCounts.E0,
-      sc.daPhanLoaiGoi,
-      sc.avgDifficultyCoefficient.toFixed(2),
-      sc.diemSoLuong.toFixed(1),
-      sc.diemDoKho.toFixed(1),
+      sc.packageCounts.PROX5, sc.packageCounts.PROX4, sc.packageCounts.PROX3,
+      sc.packageCounts.SEM, sc.packageCounts.SE1, sc.packageCounts.E0,
+      sc.daPhanLoaiGoi, sc.avgDifficultyCoefficient.toFixed(2),
+      sc.diemSoLuong.toFixed(1), sc.diemDoKho.toFixed(1),
       sc.qualityRating !== null ? sc.qualityRating : "",
       sc.diemChatLuong !== null ? sc.diemChatLuong.toFixed(1) : "",
-      sc.lateTasks,
-      sc.lateDays,
-      sc.bonusScore,
-      `"${sc.bonusNotes.replace(/"/g, '""')}"`,
-      sc.diemBonusTre.toFixed(1),
-      sc.tongDiemKpi.toFixed(1),
-      sc.trangThai
+      sc.lateTasks, sc.lateDays, sc.bonusScore,
+      `"${(sc.bonusNotes || "").replace(/"/g, '""')}"`,
+      sc.diemBonusTre.toFixed(1), sc.tongDiemKpi.toFixed(1), sc.trangThai,
     ]);
-
-    const csvContent = "\uFEFF" + [ // Add BOM for Excel UTF-8 support
-      headers.join(","),
-      ...rows.map(row => row.join(","))
-    ].join("\n");
-
+    const csvContent =
+      "\uFEFF" + [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", url);
-    link.setAttribute("download", `Bảng_điểm_KPI_Designer_Xuất_Excel.csv`);
+    link.setAttribute("download", `KPI_${currentMonthKey}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
+  // ── Loading / error screens ───────────────────────────────────────────────
+  if (dbStatus === "loading" || dbStatus === "seeding") {
+    return (
+      <div style={{
+        minHeight: "100vh", display: "flex", flexDirection: "column",
+        alignItems: "center", justifyContent: "center", gap: "1.5rem",
+        background: "var(--bg-dark)"
+      }}>
+        <div style={{
+          width: "56px", height: "56px", borderRadius: "50%",
+          border: "3px solid rgba(0,242,254,0.12)",
+          borderTopColor: "var(--primary)",
+          animation: "spin 0.9s linear infinite"
+        }} />
+        <div style={{ textAlign: "center" }}>
+          <p style={{ fontSize: "1rem", fontWeight: 600, color: "white" }}>
+            {dbStatus === "seeding" ? "Đang khởi tạo dữ liệu…" : "Đang kết nối Supabase…"}
+          </p>
+          <p style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: "0.35rem" }}>
+            {dbStatus === "seeding"
+              ? "Lần đầu chạy – đang seed dữ liệu tháng 06/2026"
+              : "Vui lòng chờ…"}
+          </p>
+        </div>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+
+  if (dbStatus === "error") {
+    return (
+      <div style={{
+        minHeight: "100vh", display: "flex", flexDirection: "column",
+        alignItems: "center", justifyContent: "center", gap: "1.5rem",
+        background: "var(--bg-dark)", padding: "2rem"
+      }}>
+        <div style={{
+          maxWidth: "560px", width: "100%",
+          background: "rgba(239,68,68,0.06)",
+          border: "1px solid rgba(239,68,68,0.3)",
+          borderRadius: "16px", padding: "2rem",
+          display: "flex", flexDirection: "column", gap: "1rem"
+        }}>
+          <h2 style={{ fontSize: "1.2rem", fontWeight: 700, color: "var(--danger)" }}>
+            Không thể kết nối cơ sở dữ liệu
+          </h2>
+          <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.7 }}>
+            Hãy đảm bảo đã chạy script SQL để tạo bảng trước khi dùng app.
+          </p>
+          <code style={{
+            background: "rgba(0,0,0,0.4)", padding: "0.75rem 1rem",
+            borderRadius: "8px", fontSize: "0.75rem", color: "var(--danger)",
+            wordBreak: "break-all", lineHeight: 1.6
+          }}>
+            {dbError}
+          </code>
+          <div style={{
+            background: "rgba(0,242,254,0.04)",
+            border: "1px solid rgba(0,242,254,0.15)",
+            borderRadius: "10px", padding: "1rem",
+            fontSize: "0.8rem", color: "var(--text-secondary)", lineHeight: 2
+          }}>
+            <strong style={{ color: "var(--primary)" }}>Hướng dẫn setup:</strong><br />
+            1. Vào <strong>Supabase Dashboard → SQL Editor</strong><br />
+            2. Mở file <code style={{ color: "var(--primary)" }}>supabase/schema.sql</code> trong project<br />
+            3. Copy toàn bộ và nhấn Run<br />
+            4. Reload trang này
+          </div>
+          <button
+            onClick={() => window.location.reload()}
+            className="btn btn-primary"
+            style={{ alignSelf: "flex-start" }}
+          >
+            Thử lại
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Main render ───────────────────────────────────────────────────────────
   return (
-    <Layout 
-      activeTab={activeTab} 
+    <Layout
+      activeTab={activeTab}
       setActiveTab={setActiveTab}
       totalTasks={totalTasksCount}
       targetPoints={config.targetPoints}
@@ -284,39 +400,32 @@ export default function App() {
       onLogout={() => {
         setIsManager(false);
         setActiveTab("dashboard");
-        showToast("🔒 Đã đăng xuất chế độ quản trị.");
+        showToast("Đã đăng xuất chế độ quản trị.");
       }}
       onManualSave={handleManualSave}
+      isSaving={isSaving}
     >
-      {/* Toast Alert Banner */}
+      {/* Toast notification */}
       {toastMsg && (
         <div style={{
-          position: "fixed",
-          top: "20px",
-          right: "20px",
-          background: "rgba(7, 19, 44, 0.9)",
-          color: "white",
-          padding: "0.85rem 1.5rem",
-          borderRadius: "var(--radius-md)",
-          boxShadow: "0 10px 25px rgba(0, 242, 254, 0.15)",
-          zIndex: 2000,
-          fontSize: "0.85rem",
-          fontWeight: 600,
-          display: "flex",
-          alignItems: "center",
-          gap: "0.5rem",
+          position: "fixed", top: "20px", right: "20px",
+          background: "rgba(7,19,44,0.95)", color: "white",
+          padding: "0.85rem 1.5rem", borderRadius: "var(--radius-md)",
+          boxShadow: "0 10px 25px rgba(0,242,254,0.15)",
+          zIndex: 2000, fontSize: "0.85rem", fontWeight: 600,
+          display: "flex", alignItems: "center", gap: "0.5rem",
           backdropFilter: "blur(12px)",
-          border: "1px solid rgba(0, 242, 254, 0.25)",
-          transition: "all 0.3s ease"
+          border: "1px solid rgba(0,242,254,0.25)",
+          animation: "fadeIn 0.3s ease"
         }}>
           {toastMsg}
         </div>
       )}
-      {/* Active page rendering */}
+
       {activeTab === "dashboard" && (
-        <Dashboard 
+        <Dashboard
           scorecards={scorecards}
-          onEditDesigner={handleEditDesigner}
+          onEditDesigner={setEditingDesignerName}
           onViewProfile={handleViewProfile}
           exportToCSV={exportToCSV}
           isManager={isManager}
@@ -324,32 +433,29 @@ export default function App() {
       )}
 
       {activeTab === "profiles" && (
-        <DesignerProfile 
+        <DesignerProfile
           scorecards={scorecards}
           selectedDesignerName={selectedDesignerName}
           setSelectedDesignerName={setSelectedDesignerName}
-          onEditDesigner={handleEditDesigner}
+          onEditDesigner={setEditingDesignerName}
           isManager={isManager}
         />
       )}
 
-      {activeTab === "report" && (
-        <WorkloadReport 
-          scorecards={scorecards}
-        />
-      )}
+      {activeTab === "report" && <WorkloadReport scorecards={scorecards} />}
 
       {activeTab === "import" && (
-        <CSVImporter 
+        <CSVImporter
           onImportTasks={handleImportTasks}
           officialDesigners={DEFAULT_DESIGNERS}
           config={config}
           monthsData={monthsData}
+          isSaving={isSaving}
         />
       )}
 
       {activeTab === "settings" && (
-        <ConfigPanel 
+        <ConfigPanel
           config={config}
           setConfig={setConfig}
           catalog={catalog}
@@ -357,73 +463,50 @@ export default function App() {
         />
       )}
 
-      {/* Metric entry modal Overlay */}
       {editingDesignerName && (
-        <ManagerInputModal 
+        <ManagerInputModal
           designerName={editingDesignerName}
-          currentInputs={activeManagerInputs[editingDesignerName]}
+          currentInputs={activeMonthData.managerInputs[editingDesignerName]}
           onSave={handleSaveManagerInputs}
           onClose={() => setEditingDesignerName(null)}
         />
       )}
 
-      {/* Passcode Login Modal */}
       {showLoginModal && (
         <div style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          background: "rgba(7, 9, 19, 0.8)",
-          backdropFilter: "blur(8px)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
+          background: "rgba(7,9,19,0.85)", backdropFilter: "blur(8px)",
+          display: "flex", alignItems: "center", justifyContent: "center",
           zIndex: 1000
         }}>
           <div className="glass-card animate-fade-in" style={{
-            width: "360px",
-            padding: "2rem",
-            display: "flex",
-            flexDirection: "column",
-            gap: "1.25rem",
+            width: "360px", padding: "2rem",
+            display: "flex", flexDirection: "column", gap: "1.25rem",
             position: "relative"
           }}>
-            <button 
-              onClick={() => {
-                setShowLoginModal(false);
-                setLoginPassword("");
-                setLoginError("");
-              }}
+            <button
+              onClick={() => { setShowLoginModal(false); setLoginPassword(""); setLoginError(""); }}
               style={{
-                position: "absolute",
-                top: "1rem",
-                right: "1rem",
-                background: "transparent",
-                border: "none",
-                color: "var(--text-secondary)",
-                cursor: "pointer",
-                fontSize: "1.2rem"
+                position: "absolute", top: "1rem", right: "1rem",
+                background: "transparent", border: "none",
+                color: "var(--text-secondary)", cursor: "pointer", fontSize: "1.2rem"
               }}
-            >
-              ✕
-            </button>
-            
-            <h3 style={{ fontSize: "1.2rem", fontWeight: 700, color: "white" }}>Manager Auth Panel</h3>
+            >✕</button>
+
+            <h3 style={{ fontSize: "1.2rem", fontWeight: 700, color: "white" }}>
+              Đăng nhập quản trị
+            </h3>
             <p style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>
-              Enter the manager password to unlock editing, catalog config, and CSV ingestion tools.
+              Nhập mật khẩu để mở khóa import CSV, cấu hình và đánh giá.
             </p>
-            
+
             <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
-              <input 
+              <input
                 type="password"
-                placeholder="Password..."
+                placeholder="Mật khẩu..."
                 value={loginPassword}
                 onChange={(e) => setLoginPassword(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleLoginSubmit();
-                }}
+                onKeyDown={(e) => { if (e.key === "Enter") handleLoginSubmit(); }}
                 className="form-input"
                 style={{ fontFamily: "monospace" }}
                 autoFocus
@@ -434,13 +517,13 @@ export default function App() {
                 </span>
               )}
             </div>
-            
-            <button 
+
+            <button
               onClick={handleLoginSubmit}
               className="btn btn-primary"
               style={{ justifyContent: "center" }}
             >
-              Unlock Manager Options
+              Đăng nhập
             </button>
           </div>
         </div>

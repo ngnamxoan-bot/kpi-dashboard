@@ -283,6 +283,10 @@ export const DEFAULT_DESIGNERS = [
   {
     "name": "Nathan",
     "group": "Media Key"
+  },
+  {
+    "name": "Kimmy",
+    "group": "Media Key"
   }
 ];
 
